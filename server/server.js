@@ -11,7 +11,8 @@ app.use(bodyParser.json());
 
 app.post('/todos',(req,res)=>{
     var todo=new Todo({
-        text:req.body.text
+        text:req.body.text,
+        complete:req.body.complete
     });
 
     todo.save().then((doc)=>{
@@ -21,6 +22,20 @@ app.post('/todos',(req,res)=>{
     });
 });
 
+
+app.get('/todos',(req,res)=>{
+    
+
+    Todo.find().then((e,docs)=>{
+        res.send(e);
+    },(e)=>{
+        res.status(400).send(e);
+    });
+});
+
 app.listen(3000,()=>{
     console.log('server running on port 3000')
 });
+
+
+module.exports={app};
