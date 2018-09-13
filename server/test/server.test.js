@@ -1,15 +1,18 @@
 const expect=require('expect');
 const request = require('supertest');
+const {ObjectID}=require('mongodb');
 
 const {app}=require('./../server');
 const {Todo}=require('./../models/todo');
 
 const todos=[{
+    _id:'5b997672a77535242a124a79',
     text:"first test todos"},
     {
     text: "second test todos"
     }];
 
+const id= new ObjectID()
 
 beforeEach((done)=>{
     Todo.remove({}).then(()=>{
@@ -68,3 +71,30 @@ it('should get all todos',(done)=>{
     .end(done);
     });
 });
+
+
+describe('Get/todos/:_id', ()=>{
+    it('should get todos by id',(done)=>{
+        request(app)
+        .get('/todos/5b997672a77535242a124a79')
+        .expect(200)
+        .expect((res)=> {
+            expect(res.body.todo._id).toBe('5b997672a77535242a124a79');
+        })
+        .end(done);
+        });
+
+    it('should not accept wrong input', (done)=>{
+        request(app)
+        .get('/todos/5b997672a77535242a124a795')
+        .expect(404)
+        .end(done);
+    })
+    it('should return not found', (done)=>{
+        request(app)
+        .get('/todos/5b997672a77535242a124a78')
+        .expect(404)
+        .end(done);
+    })
+
+    });
