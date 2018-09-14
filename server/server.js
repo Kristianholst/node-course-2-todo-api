@@ -54,7 +54,22 @@ app.get('/todos/:id',(req,res)=>{
         res.status(404).send("invalid id");
     }});
 
-        
+
+ app.delete('/todos/:id',(req,res)=>{
+        var id = req.params.id;
+        if (ObjectID.isValid(id)){
+    
+            Todo.findByIdAndRemove(id).then((todo)=>{
+            if (!todo){
+                res.status(404).send("Not found")
+            } else {
+                res.send({todo})
+            }
+        },(e)=>{
+            res.send('ID not found')})
+        } else {
+            res.status(404).send("invalid id");
+        }});
         
 
 module.exports={app};

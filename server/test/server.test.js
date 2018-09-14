@@ -98,3 +98,30 @@ describe('Get/todos/:_id', ()=>{
     })
 
     });
+
+
+describe('Get/todos/:_id', ()=>{
+    it('should remove todo by id',(done)=>{
+        request(app)
+        .remove('/todos/5b997672a77535242a124a79')
+        .expect(200)
+        .expect((res)=> {
+            expect(res.body.todo._id).toBe('5b997672a77535242a124a79');
+        })
+        .end(done);
+        });
+
+    it('should not accept wrong input', (done)=>{
+        request(app)
+        .get('/todos/5b997672a77535242a124a795')
+        .expect(404)
+        .end(done);
+    })
+    it('should return not found', (done)=>{
+        request(app)
+        .get('/todos/5b997672a77535242a124a78')
+        .expect(404)
+        .end(done);
+    })
+
+    });
