@@ -5,14 +5,15 @@ const {ObjectID}=require('mongodb');
 const {app}=require('./../server');
 const {Todo}=require('./../models/todo');
 
-const todos=[{
-    _id:'5b997672a77535242a124a79',
-    text:"first test todos"},
-    {
-    text: "second test todos"
-    }];
+const todos = [{
+    _id: new ObjectID(),
+    text: 'First test todo'
+  }, {
+    _id: new ObjectID(),
+    text: 'Second test todo'
+  }];
 
-const id= new ObjectID()
+
 
 beforeEach((done)=>{
     Todo.remove({}).then(()=>{
@@ -75,11 +76,12 @@ it('should get all todos',(done)=>{
 
 describe('Get/todos/:_id', ()=>{
     it('should get todos by id',(done)=>{
+        var hexId = todos[0]._id.toHexString();
         request(app)
-        .get('/todos/5b997672a77535242a124a79')
+        .get(`/todos/${hexId}`)
         .expect(200)
         .expect((res)=> {
-            expect(res.body.todo._id).toBe('5b997672a77535242a124a79');
+            expect(res.body.todo._id).toBe( hexId);
         })
         .end(done);
         });
@@ -100,28 +102,40 @@ describe('Get/todos/:_id', ()=>{
     });
 
 
-describe('Get/todos/:_id', ()=>{
-    it('should remove todo by id',(done)=>{
-        request(app)
-        .remove('/todos/5b997672a77535242a124a79')
-        .expect(200)
-        .expect((res)=> {
-            expect(res.body.todo._id).toBe('5b997672a77535242a124a79');
-        })
-        .end(done);
+    describe('DELETE /todos/:id', () => {
+        it('should remove a todo', (done) => {
+          var hexId = todos[1]._id.toHexString();
+      
+          request(app)
+            .delete(`/todos/${hexId}`)
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.todo._id).toBe(hexId);
+            })
+            .end((err, res) => {
+              if (err) {
+                return done(err);
+              }
+      
+              Todo.findById(hexId).then((todo) => {
+                expect(todo).toBeFalsy();
+                done();
+              }).catch((e) => done(e));
+            });
         });
-
-    it('should not accept wrong input', (done)=>{
-        request(app)
-        .get('/todos/5b997672a77535242a124a795')
-        .expect(404)
-        .end(done);
-    })
-    it('should return not found', (done)=>{
-        request(app)
-        .get('/todos/5b997672a77535242a124a78')
-        .expect(404)
-        .end(done);
-    })
-
+        it('should return 404 if todo not found', (done) => {
+            var hexId = new ObjectID().toHexString();
+        
+            request(app)
+              .delete(`/todos/${hexId}`)
+              .expect(404)
+              .end(done);
+          });
+        
+          it('should return 404 if object id is invalid', (done) => {
+            request(app)
+              .delete('/todos/123abc')
+              .expect(404)
+              .end(done);
+          });   
     });
