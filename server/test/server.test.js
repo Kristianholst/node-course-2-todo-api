@@ -7,10 +7,13 @@ const {Todo}=require('./../models/todo');
 
 const todos = [{
     _id: new ObjectID(),
-    text: 'First test todo'
+    text: 'First test todo',
+    complete:false
   }, {
     _id: new ObjectID(),
-    text: 'Second test todo'
+    text: 'Second test todo',
+    complete:false,
+    completedAt:123
   }];
 
 
@@ -139,3 +142,25 @@ describe('Get/todos/:_id', ()=>{
               .end(done);
           });   
     });
+
+    describe('PATCH /todos/:id', () => {
+        it('should UPDATE THE TODOS', (done) => {
+          var hexId = todos[0]._id.toHexString();
+          var text='new text';
+          console.log(hexId);
+          request(app)
+            .patch(`/todos/${hexId}`)
+            .send({
+                complete:true,
+                text
+            })
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.todo.text).toBe(text);
+              expect(res.body.todo.complete).toBe(true);
+              expect(typeof res.body.todo.completedAt).toBe('number');
+            })
+            .end(done);
+        });
+    });
+    

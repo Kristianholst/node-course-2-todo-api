@@ -77,16 +77,17 @@ app.delete('/todos/:id',(req,res)=>{
 
 app.patch('/todos/:id',(req,res)=>{
     var id = req.params.id;
-    var body =_.pick(req.body,['text','coompleted']);
+    var body =_.pick(req.body,['text','complete']);
 
     if (!ObjectID.isValid(id)){
         return res.status(404).send();
     }
     
-    if (_.isBoolean(body.completed) && body.completed){
+    if (_.isBoolean(body.complete) && body.complete){
         body.completedAt= new Date().getTime();
+
     } else {
-        body.completed=false;
+        body.complete=false;
         body.completedAt=null;
     }
     
